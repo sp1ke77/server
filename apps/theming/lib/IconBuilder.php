@@ -54,13 +54,34 @@ class IconBuilder {
 	 */
 	public function getFavicon($app) {
 		try {
-			$icon = $this->renderAppIcon($app, 32);
+			$favicon = new Imagick();
+			$favicon->setFormat("ico");
+			$icon = $this->renderAppIcon($app, 128);
 			if ($icon === false) {
 				return false;
 			}
-			$icon->setImageFormat("png24");
-			$data = $icon->getImageBlob();
+			$icon->setImageFormat("png32");
+
+			$clone = $icon->clone();
+			$clone->scaleImage(16,0);
+			$favicon->addImage($clone);
+
+			$clone = $icon->clone();
+			$clone->scaleImage(32,0);
+			$favicon->addImage($clone);
+
+			$clone = $icon->clone();
+			$clone->scaleImage(64,0);
+			$favicon->addImage($clone);
+
+			$clone = $icon->clone();
+			$clone->scaleImage(128,0);
+			$favicon->addImage($clone);
+
+			$data = $favicon->getImagesBlob();
+			$favicon->destroy();
 			$icon->destroy();
+			$clone->destroy();
 			return $data;
 		} catch (\ImagickException $e) {
 			return false;
